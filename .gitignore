@@ -2,3 +2,4 @@ input
 output
 .vscode
 _unused
+*.ini
