@@ -2,5 +2,6 @@
     "screen_width": 2560,
     "screen_height": 1440,
     "mode": "fill",
-    "format": "png"
+    "format": "png",
+    "input_dir": "input"
 }

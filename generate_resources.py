@@ -20,11 +20,20 @@ def generate_dds(png: str):
     subprocess.run(["texconv.exe", "-f", "BC7_UNORM", "-y", "-sepalpha", "-srgb", "-m", "1", "-o", ".", png], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     os.remove(png)
 
-if not os.path.exists("input"):
-    print("Error: input folder not found")
+
+if not os.path.exists("config.json"):
+    print("Error: config.json not found")
     exit()
-files = [x for x in os.listdir("input") if (x.endswith("png") or x.endswith("jpg") or x.endswith("jpeg"))]
+
 config = json.load(open("config.json", "r"))
+
+input_dir = config["input_dir"]
+if not os.path.exists(input_dir):
+    print("Error: input directory not found")
+    exit()
+
+files = [x for x in os.listdir(input_dir) if (x.endswith("png") or x.endswith("jpg") or x.endswith("jpeg"))]
+
 dds = config["format"] == "dds"
 tw, th = config["screen_width"], config["screen_height"]
 tr = tw / th
@@ -43,7 +52,7 @@ if not os.path.exists("output"):
 
 for file in files:
     print(f"{(index+1):{0}>4}/{(len(files)):{0}>4}")
-    img = Image.open(f"./input/{file}")
+    img = Image.open(f"./{input_dir}/{file}")
     img = modes[mode](img)
     png = f"output/{index:{0}>4}.png"
     img.save(png, 'PNG', srgb=False)
