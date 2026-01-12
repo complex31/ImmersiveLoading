@@ -1,4 +1,4 @@
-./input
-./output
-./.vscode
-./*.pdn
+input
+output
+.vscode
+_unused

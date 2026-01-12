@@ -3,5 +3,5 @@
     "screen_height": 1440,
     "mode": "fill",
     "format": "png",
-    "input_dir": "input"
+    "input_dir": "input/normal_wide"
 }

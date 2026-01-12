@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 from PIL import Image
 import json
@@ -47,13 +48,14 @@ if mode not in modes:
 
 index = 0
 print("processing... ")
-if not os.path.exists("output"):
-    os.makedirs("output") 
+shutil.rmtree("output")
+os.makedirs("output")
 
 for file in files:
     print(f"{(index+1):{0}>4}/{(len(files)):{0}>4}")
     img = Image.open(f"./{input_dir}/{file}")
     img = modes[mode](img)
+    img = img.transpose(Image.FLIP_TOP_BOTTOM)
     png = f"output/{index:{0}>4}.png"
     img.save(png, 'PNG', srgb=False)
     if dds:
