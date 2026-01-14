@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from PIL import Image
 import json
+from multiprocessing import Process
 
 def fill(img: Image) -> Image:
     global tw, th, tr
@@ -14,12 +15,13 @@ def fill(img: Image) -> Image:
     else:
         c = height / 2
         img = img.crop((0, c - 0.5*width/tr, width, c + 0.5*width/tr))
-    img = img.resize((tw, th), Image.LANCZOS)
+    if img.size[0] > tw:
+      img = img.resize((tw, th), Image.LANCZOS)
     return img
 
-def generate_dds(png: str):
-    subprocess.run(["texconv.exe", "-f", "BC7_UNORM", "-y", "-sepalpha", "-srgb", "-m", "1", "-o", ".", png], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    os.remove(png)
+def generate_dds(name: str):
+    subprocess.run(["texconv.exe", "-f", "BC7_UNORM", "-y", "-sepalpha", "-srgb", "-m", "1", "-o", ".", name], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    os.remove(name)
 
 
 if not os.path.exists("config.json"):
@@ -36,6 +38,7 @@ if not os.path.exists(input_dir):
 files = [x for x in os.listdir(input_dir) if (x.endswith("png") or x.endswith("jpg") or x.endswith("jpeg"))]
 
 dds = config["format"] == "dds"
+jpg = config["format"] == "jpg"
 tw, th = config["screen_width"], config["screen_height"]
 tr = tw / th
 mode = config["mode"]
@@ -46,19 +49,23 @@ if mode not in modes:
     print(f"Error: unknown mode, supported modes: {modes.keys}")
     exit()
 
-index = 0
 print("processing... ")
 shutil.rmtree("output")
 os.makedirs("output")
 
-for file in files:
-    print(f"{(index+1):{0}>4}/{(len(files)):{0}>4}")
+def process(i: int):
     img = Image.open(f"./{input_dir}/{file}")
     img = modes[mode](img)
-    img = img.transpose(Image.FLIP_TOP_BOTTOM)
-    png = f"output/{index:{0}>4}.png"
-    img.save(png, 'PNG', srgb=False)
+    img = img.transpose(Image.FLIP_TOP_BOTTOM).convert("RGB")
+    out = f"output/{i:{0}>4}.{"jpg" if jpg else "png"}"
+    img.save(out, srgb=False)
     if dds:
-        generate_dds(png)
+        generate_dds(out)
+
+index = 0
+for file in files:
+    print(f"{(index+1):{0}>4}/{(len(files)):{0}>4} : {files[index]}")
+    #Process(target = process, args= (index,)).run()
+    process(index)
     index += 1
     

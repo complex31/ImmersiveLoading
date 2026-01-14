@@ -31,7 +31,7 @@ void main(
   r0.xyzw = cb0[15].xyzw + r0.xyzw;
   o0.xyzw = v1.xyzw * r0.xyzw;
 
-  o0.xy = v2.xy;
+  o0.xyz = float3(1,0,1);
   return;
 }
 

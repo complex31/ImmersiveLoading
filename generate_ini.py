@@ -13,20 +13,21 @@ global persist $cursor = 0
 global $cursor2 = 1
 global $active_bar = 0
 global $active_bg = 0
+global $active_icon = 0
 \n'''
 
 present = '''
 [Present]
 x185 = $active_bar
 y185 = $active_bg
-; TODO: set vignette mode
-z185 = 0
+z185 = $active_icon
 post $active_bar = $active_bar - 1
 post $active_bg = $active_bg - 1
+post $active_icon = $active_icon - 1
 if $active_bar == 1
   $curr_img = $cursor // 1
   $cursor = ($cursor + $n_imgs * $cursor2 * 0.318309) % $n_imgs
-  $cursor2 = ($cursor2 + ($n_imgs // 2 + 1) * 0.368217) % ($n_imgs // 2 + 1)
+  $cursor2 = ($cursor2 + ($n_imgs // 2 + 1) * 0.468217) % ($n_imgs // 2 + 1)
 endif
 \n'''
 
@@ -35,6 +36,9 @@ overrides = '''
 hash = 77fe5250
 handling = skip
 this = ResourceLB
+x186 = 1
+y186 = 1
+z186 = 1
 run = CustomShaderLB
 $active_bar = 2
 
@@ -45,6 +49,64 @@ if $active_bar >= 1 && $active_bg >= 1
 endif
 $active_bg = 2
 
+
+[TextureOverrideLSLoadBarBiggerHydro]
+hash = 29feba14
+x186 = 0
+y186 = 0.5
+z186 = 1
+run = CustomShaderLB
+$active_icon = 2
+
+[TextureOverrideLSLoadBarBiggerCryo]
+hash = 19f48cd6
+x186 = 0.7
+y186 = 0.8
+z186 = 1
+run = CustomShaderLB
+$active_icon = 2
+
+[TextureOverrideLSLoadBarBiggerPyro]
+hash = b891661d
+x186 = 1
+y186 = 0.5
+z186 = 0
+run = CustomShaderLB
+$active_icon = 2
+
+[TextureOverrideLSLoadBarBiggerDendro]
+hash = b53d4fd0
+x186 = 0.5
+y186 = 1
+z186 = 0
+run = CustomShaderLB
+$active_icon = 2
+
+[TextureOverrideLSLoadBarBiggerGeo]
+hash = 91f2d7cc
+x186 = 0.8
+y186 = 0.8
+z186 = 0
+run = CustomShaderLB
+$active_icon = 2
+
+[TextureOverrideLSLoadBarBiggerAnemo]
+hash = 0f078b00
+x186 = 0
+y186 = 0.8
+z186 = 0.8
+run = CustomShaderLB
+$active_icon = 2
+
+[TextureOverrideLSLoadBarBiggerElectro]
+hash = 59c10306
+x186 = 0.5
+y186 = 0
+z186 = 1
+run = CustomShaderLB
+$active_icon = 2
+
+
 [ShaderOverrideLS]
 hash = f61f9bc2a15bedef
 run = CommandListCTO
@@ -52,6 +114,15 @@ run = CommandListCTO
 [ShaderOverrideLB]
 hash = 4f8eee47124e933d
 run = CommandListCTO
+
+;[ShaderOverrideVG]
+;hash = 04911d8f38cd5d4b
+;allow_duplicate_hash = overrule
+;run = CommandListCTO
+
+;[ShaderOverrideIcon]
+;hash = 4f028a0d23349e1f
+;run = CommandListCTO
 \n'''
 
 customshader = '''
@@ -67,8 +138,12 @@ draw = from_caller
 ;ps = 04911d8f38cd5d4b-ps_replace.txt
 ;draw = from_caller
 
+;[CustomShaderIcon]
+;ps = 4f028a0d23349e1f-ps_replace.txt
+;draw = from_caller
+
 [CommandListCTO]
-if $active_bar >= 1 && $active_bg >= 1
+if ($active_icon >= 1 || $active_bar >= 1) && $active_bg >= 1
   run = CommandListSkin
 endif
 \n'''

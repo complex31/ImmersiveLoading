@@ -55,12 +55,8 @@ void main(
   o2.xy = v2.xy;
   o2.zw = float2(0,0);
   o3.xyzw = v0.xyzw;
-  float br = 1;
   if (ACTIVE.x >= 1 && ACTIVE.y >= 1) {
-    if (ACTIVE.z == 1) {
-      br = 1 - pow((1-v2.y), 2);
-    }
-    o1.xyz = br.xxx;
+    o1.xyz = float3(1,1,1);
   }
   return;
 }

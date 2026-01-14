@@ -3,3 +3,4 @@ output
 .vscode
 _unused
 *.ini
+*.zip
