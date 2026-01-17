@@ -8,9 +8,9 @@ if (n == 0):
 
 constants = f'''[Constants]
 global $n_imgs = {n}
-global $curr_img = 0
-global persist $cursor = 0
-global $cursor2 = 1
+global persist $curr_img
+global persist $cursor
+global persist $cursor2
 global $active_bar = 0
 global $active_bg = 0
 global $active_icon = 0
@@ -21,6 +21,11 @@ present = '''
 x185 = $active_bar
 y185 = $active_bg
 z185 = $active_icon
+; set vignette mode below
+; 0 = none, 1 = bottom, 2 = top+bottom
+x187 = 2
+; set vignette strength below, default = 4, use positive integer only to avoid bugs
+y187 = 4
 post $active_bar = $active_bar - 1
 post $active_bg = $active_bg - 1
 post $active_icon = $active_icon - 1
@@ -47,21 +52,25 @@ hash = b7ff7a6e
 if $active_bar >= 1 && $active_bg >= 1
   run = CommandListLS
 endif
+if $active_bg >= 1 && $active_icon >= 1
+  run = CommandListLSLogin
+endif
 $active_bg = 2
 
+; -----------------------------------
 
 [TextureOverrideLSLoadBarBiggerHydro]
 hash = 29feba14
 x186 = 0
-y186 = 0.5
+y186 = 0.749
 z186 = 1
 run = CustomShaderLB
 $active_icon = 2
 
 [TextureOverrideLSLoadBarBiggerCryo]
 hash = 19f48cd6
-x186 = 0.7
-y186 = 0.8
+x186 = 0.557
+y186 = 1
 z186 = 1
 run = CustomShaderLB
 $active_icon = 2
@@ -69,43 +78,90 @@ $active_icon = 2
 [TextureOverrideLSLoadBarBiggerPyro]
 hash = b891661d
 x186 = 1
-y186 = 0.5
-z186 = 0
+y186 = 0.427
+z186 = 0.247
 run = CustomShaderLB
 $active_icon = 2
 
 [TextureOverrideLSLoadBarBiggerDendro]
 hash = b53d4fd0
-x186 = 0.5
-y186 = 1
-z186 = 0
+x186 = 0.525
+y186 = 0.973
+z186 = 0.012
 run = CustomShaderLB
 $active_icon = 2
 
 [TextureOverrideLSLoadBarBiggerGeo]
 hash = 91f2d7cc
-x186 = 0.8
-y186 = 0.8
-z186 = 0
+x186 = 1
+y186 = 0.788
+z186 = 0.031
 run = CustomShaderLB
 $active_icon = 2
 
 [TextureOverrideLSLoadBarBiggerAnemo]
 hash = 0f078b00
-x186 = 0
-y186 = 0.8
-z186 = 0.8
+x186 = 0.482
+y186 = 1
+z186 = 0.824
 run = CustomShaderLB
 $active_icon = 2
 
 [TextureOverrideLSLoadBarBiggerElectro]
 hash = 59c10306
-x186 = 0.5
-y186 = 0
+x186 = 0.690
+y186 = 0.388
 z186 = 1
 run = CustomShaderLB
 $active_icon = 2
 
+; ---------------------------------------
+
+;[TextureOverrideText]
+;hash = 45544863
+;run = CommandListLS_Text
+
+[TextureOverrideLSInazuma]
+hash = f7659a3a
+run = CommandListRegionIcon
+
+[TextureOverrideLSMondstadt]
+hash = 0e22a02d
+run = CommandListRegionIcon
+
+[TextureOverrideLSLiyue]
+hash = e215b20a
+run = CommandListRegionIcon
+
+[TextureOverrideLSSumeru]
+hash = 593c1434
+run = CommandListRegionIcon
+
+[TextureOverrideLSDungeon]
+hash = 121d3c8f
+run = CommandListRegionIcon
+
+[TextureOverrideLSTeapot]
+hash = 874fa63b
+run = CommandListRegionIcon
+
+[TextureOverrideLSColonnade]
+hash = 08b0e6b4
+run = CommandListRegionIcon
+
+[TextureOverrideLSDragonspine]
+hash = d7b6f066
+run = CommandListRegionIcon
+
+[TextureOverrideLSChasm]
+hash = 910ff5fe
+run = CommandListRegionIcon
+
+[TextureOverrideLSEnkanomiya]
+hash = 4869caec
+run = CommandListRegionIcon
+
+; ---------------------------------------
 
 [ShaderOverrideLS]
 hash = f61f9bc2a15bedef
@@ -141,23 +197,38 @@ draw = from_caller
 ;[CustomShaderIcon]
 ;ps = 4f028a0d23349e1f-ps_replace.txt
 ;draw = from_caller
-
-[CommandListCTO]
-if ($active_icon >= 1 || $active_bar >= 1) && $active_bg >= 1
-  run = CommandListSkin
-endif
 \n'''
 
 resources = [
     "[ResourceLB]\nfilename = loadingbar_2x.dds\n",
+    "[ResourceLSLogin]\nfilename = .\\login\\login.jpg\n",
     f"[ResourceLS.0]\nfilename = .\\output\\{files[0]}\n"
 ]
-    
+
+commandlist = '''
+[CommandListCTO]
+if ($active_icon >= 1 || $active_bar >= 1) && $active_bg >= 1
+  run = CommandListSkin
+endif
+
+[CommandListRegionIcon]
+if $active_bar >= 1 && $active_bg >= 1
+  handling = skip
+endif
+
+[CommandListLSLogin]
+handling = skip
+this = ResourceLSLogin
+run = CustomShaderLS
+\n'''
+
+commandlist_cond_prefix = '''[CommandListLS]
+handling = skip
+if $curr_img == 0
+  this = ResourceLS.0'''
+
 commandlist_cond = [
-    "[CommandListLS]",
-    "handling = skip",
-    "if $curr_img == 0",
-    "  this = ResourceLS.0"
+    commandlist_cond_prefix
 ]
 
 
@@ -165,13 +236,14 @@ for i in range(1,n):
     resources.append(f"[ResourceLS.{i}]\nfilename = .\\output\\{files[i]}\n")
     commandlist_cond.append(f"else if $curr_img == {i}\n  this = ResourceLS.{i}")
     
-commandlist_cond.append("endif\nrun = CustomShaderLS\n;run = CustomShaderVG\n")
+commandlist_cond.append("endif\nrun = CustomShaderLS\n")
 
 inifile = open("mod.ini", "w")
 inifile.write(constants)
 inifile.write(present)
 inifile.write(overrides)
 inifile.write(customshader)
+inifile.write(commandlist)
 inifile.write("\n".join(commandlist_cond))
 inifile.write("\n\n; ---------- Resources ---------\n\n")
 inifile.write("\n".join(resources))

@@ -55,7 +55,7 @@ void main(
   o2.xy = v2.xy;
   o2.zw = float2(0,0);
   o3.xyzw = v0.xyzw;
-  if (ACTIVE.x >= 1 && ACTIVE.y >= 1) {
+  if (ACTIVE.x >= 1 && (ACTIVE.y >= 1 || ACTIVE.z >= 1)) {
     o1.xyz = float3(1,1,1);
   }
   return;
