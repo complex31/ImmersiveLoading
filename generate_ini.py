@@ -161,6 +161,30 @@ run = CommandListRegionIcon
 hash = 4869caec
 run = CommandListRegionIcon
 
+[TextureOverrideLSNatlan]
+hash = 66196151
+run = CommandListRegionIcon
+
+[TextureOverrideLSSacredMountain]
+hash = bc691e6c
+run = CommandListRegionIcon
+
+[TextureOverrideLSBygoneSea]
+hash = ce44eeb5
+run = CommandListRegionIcon
+
+[TextureOverrideLSNodkrai]
+hash = 5352112f
+run = CommandListRegionIcon
+
+[TextureOverrideLSFontaine]
+hash = 59fed606
+run = CommandListRegionIcon
+
+[TextureOverrideLSChenyuVale]
+hash = a292accf
+run = CommandListRegionIcon
+
 ; ---------------------------------------
 
 [ShaderOverrideLS]
