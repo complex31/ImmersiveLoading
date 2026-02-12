@@ -5,8 +5,8 @@ paths = []
 for r in res:
   for f in r[2]:
     p = (f"{r[0]}/{f}").replace("/", "\\")
-    if "DISABLED" not in p and (p.endswith((".png", ".jpg",".dds"))):
-      paths.append()
+    if "DISABLED" not in p and (p.endswith((".png", ".jpg", "jpeg", ".dds"))):
+      paths.append(p)
 
 n = len(paths)
 constants = f'''[Constants]
