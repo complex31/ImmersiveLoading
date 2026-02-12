@@ -1,16 +1,18 @@
 import os
-files = os.listdir("output")
-n = len(files)
+res = os.walk("output")
+paths = []
 
-if (n == 0):
-    print("no files, exiting...")
-    exit()
+for r in res:
+  for f in r[2]:
+    p = (f"{r[0]}/{f}").replace("/", "\\")
+    if "DISABLED" not in p and (p.endswith((".png", ".jpg",".dds"))):
+      paths.append()
 
+n = len(paths)
 constants = f'''[Constants]
 global $n_imgs = {n}
+global $frame = 0
 global persist $curr_img
-global persist $cursor
-global persist $cursor2
 global $active_bar = 0
 global $active_bg = 0
 global $active_icon = 0
@@ -29,10 +31,9 @@ y187 = 4
 post $active_bar = $active_bar - 1
 post $active_bg = $active_bg - 1
 post $active_icon = $active_icon - 1
+post $frame = $frame + 1
 if $active_bar == 1
-  $curr_img = $cursor // 1
-  $cursor = ($cursor + $n_imgs * $cursor2 * 0.318309) % $n_imgs
-  $cursor2 = ($cursor2 + ($n_imgs // 2 + 1) * 0.468217) % ($n_imgs // 2 + 1)
+  $curr_img = $frame % $n_imgs
 endif
 \n'''
 
@@ -226,7 +227,7 @@ draw = from_caller
 resources = [
     "[ResourceLB]\nfilename = loadingbar_2x.dds\n",
     "[ResourceLSLogin]\nfilename = .\\login\\login.jpg\n",
-    f"[ResourceLS.0]\nfilename = .\\output\\{files[0]}\n"
+    f"[ResourceLS.0]\nfilename = .\\{paths[0]}\n"
 ]
 
 commandlist = '''
@@ -257,7 +258,7 @@ commandlist_cond = [
 
 
 for i in range(1,n):
-    resources.append(f"[ResourceLS.{i}]\nfilename = .\\output\\{files[i]}\n")
+    resources.append(f"[ResourceLS.{i}]\nfilename = .\\{paths[i]}\n")
     commandlist_cond.append(f"else if $curr_img == {i}\n  this = ResourceLS.{i}")
     
 commandlist_cond.append("endif\nrun = CustomShaderLS\n")

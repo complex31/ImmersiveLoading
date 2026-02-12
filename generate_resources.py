@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from PIL import Image
 import json
-from multiprocessing import Process
+# from multiprocessing import Process
 
 def fill(img: Image) -> Image:
     global tw, th, tr
@@ -23,6 +23,15 @@ def generate_dds(name: str):
     subprocess.run(["texconv.exe", "-f", "BC7_UNORM", "-y", "-sepalpha", "-srgb", "-m", "1", "-o", ".", name], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     os.remove(name)
 
+def process(out: str, path: str):
+    img = Image.open(path)
+    img = modes[mode](img)
+    img = img.transpose(Image.FLIP_TOP_BOTTOM).convert("RGB")
+    outpath = f"output/{out}.{"jpg" if jpg else "png"}"
+    print(outpath)
+    img.save(outpath, srgb=False)
+    if dds:
+        generate_dds(out)
 
 if not os.path.exists("config.json"):
     print("Error: config.json not found")
@@ -30,13 +39,7 @@ if not os.path.exists("config.json"):
 
 config = json.load(open("config.json", "r"))
 
-input_dir = config["input_dir"]
-if not os.path.exists(input_dir):
-    print("Error: input directory not found")
-    exit()
-
-files = [x for x in os.listdir(input_dir) if (x.endswith("png") or x.endswith("jpg") or x.endswith("jpeg"))]
-
+input_dirs = config["input_dirs"]
 dds = config["format"] == "dds"
 jpg = config["format"] == "jpg"
 tw, th = config["screen_width"], config["screen_height"]
@@ -49,23 +52,28 @@ if mode not in modes:
     print(f"Error: unknown mode, supported modes: {modes.keys}")
     exit()
 
-print("processing... ")
 shutil.rmtree("output")
 os.makedirs("output")
 
-def process(i: int):
-    img = Image.open(f"./{input_dir}/{file}")
-    img = modes[mode](img)
-    img = img.transpose(Image.FLIP_TOP_BOTTOM).convert("RGB")
-    out = f"output/{i:{0}>4}.{"jpg" if jpg else "png"}"
-    img.save(out, srgb=False)
-    if dds:
-        generate_dds(out)
+d_index = 0
 
-index = 0
-for file in files:
-    print(f"{(index+1):{0}>4}/{(len(files)):{0}>4} : {files[index]}")
-    #Process(target = process, args= (index,)).run()
-    process(index)
-    index += 1
+for input_dir in input_dirs:
+    if not os.path.exists(input_dir):
+        print(f"Skipped: input directory not found: {input_dir}")
+        continue
+    print(f"processing... [{input_dir}]")
+    os.makedirs(f"output/{(d_index+1):{0}>2}")
+    
+    index = 0
+    files = [x for x in os.listdir(input_dir) if (x.endswith("png") or x.endswith("jpg") or x.endswith("jpeg"))]
+    for file in files:
+        path = f"./{input_dir}/{file}"
+        out = f"{(d_index+1):{0}>2}/{(index+1):{0}>4}"
+        print(f"{(index+1):{0}>4}/{(len(files)):{0}>4} : {files[index]}")
+        print(out)
+        print(path)
+        #Process(target = process, args= (index,)).run()
+        process(out, path)
+        index += 1
+    d_index += 1
     
