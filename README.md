@@ -1,8 +1,8 @@
 # Loading Screen Mod Generator
 
 ## Prerequisites
-- Install [Python]{https://python.org/downloads}
-- Install [Pillow]{https://pypi.org/project/pillow/}
+- Install [Python](https://python.org/downloads)
+- Install [Pillow](https://pypi.org/project/pillow/)
 
 ## Setup
 - Clone this repository inside your 3DMigoto Mods folder
