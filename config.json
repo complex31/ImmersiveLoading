@@ -3,5 +3,5 @@
     "screen_height": 1440,
     "mode": "fill",
     "format": "jpg",
-    "input_dirs": ["input/chibi_wide", "input/normal_wide"]
+    "input_dirs": ["input/sample"]
 }

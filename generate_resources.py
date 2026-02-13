@@ -28,7 +28,6 @@ def process(out: str, path: str):
     img = modes[mode](img)
     img = img.transpose(Image.FLIP_TOP_BOTTOM).convert("RGB")
     outpath = f"output/{out}.{"jpg" if jpg else "png"}"
-    print(outpath)
     img.save(outpath, srgb=False)
     if dds:
         generate_dds(out)
@@ -56,6 +55,7 @@ shutil.rmtree("output")
 os.makedirs("output")
 
 d_index = 0
+processed_paths = set()
 
 for input_dir in input_dirs:
     if not os.path.exists(input_dir):
@@ -65,13 +65,18 @@ for input_dir in input_dirs:
     os.makedirs(f"output/{(d_index+1):{0}>2}")
     
     index = 0
-    files = [x for x in os.listdir(input_dir) if (x.endswith("png") or x.endswith("jpg") or x.endswith("jpeg"))]
-    for file in files:
-        path = f"./{input_dir}/{file}"
+    res = os.walk(input_dir)
+    paths = []
+    for r in res:
+        for f in r[2]:
+            p = f"{r[0]}/{f}"
+            if p not in processed_paths and (p.endswith((".png", ".jpg", "jpeg"))):
+                paths.append(p)
+                processed_paths.add(p)
+    
+    for path in paths:
         out = f"{(d_index+1):{0}>2}/{(index+1):{0}>4}"
-        print(f"{(index+1):{0}>4}/{(len(files)):{0}>4} : {files[index]}")
-        print(out)
-        print(path)
+        print(f"{(index+1):{0}>4}/{(len(paths)):{0}>4} : {path}")
         #Process(target = process, args= (index,)).run()
         process(out, path)
         index += 1
