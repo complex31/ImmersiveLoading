@@ -19,3 +19,7 @@
 - Run `generate_resources.py` to convert images from your input folder into proper aspect ratio and format
 - Run `generate_ini.py` to generate 3DMigoto mod INI file according to the output images from the previous step
 - To skip certain subfolder or image from `output`, add "DISABLED" in the folder name before running the script for generating INI
+
+## Known bugs
+- Sometimes during in-game night, the loading screen might show dark color for a few frames. This is likely caused by the shader that darkens/lightens the loading screen based on in-game time, but I have figured out how exactly to fix it yet
+- Some UI elements and object might display as solid-color patches for a few frames just after the loading screen fades away. Not sure how to fix it yet.
