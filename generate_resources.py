@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from PIL import Image
 import json
-# from multiprocessing import Process
+from multiprocessing import Process
 
 def fill(img: Image) -> Image:
     global tw, th, tr
@@ -51,8 +51,7 @@ if mode not in modes:
     print(f"Error: unknown mode, supported modes: {modes.keys}")
     exit()
 
-shutil.rmtree("output")
-os.makedirs("output")
+os.makedirs("output", exist_ok=True)
 
 d_index = 0
 processed_paths = set()
@@ -62,7 +61,8 @@ for input_dir in input_dirs:
         print(f"Skipped: input directory not found: {input_dir}")
         continue
     print(f"processing... [{input_dir}]")
-    os.makedirs(f"output/{(d_index+1):{0}>2}")
+    trunc_path = "/".join(input_dir.split("/")[1:])
+    os.makedirs(f"output/{trunc_path}", exist_ok=True)
     
     index = 0
     res = os.walk(input_dir)
@@ -75,10 +75,10 @@ for input_dir in input_dirs:
                 processed_paths.add(p)
     
     for path in paths:
-        out = f"{(d_index+1):{0}>2}/{(index+1):{0}>4}"
+        out = f"{trunc_path}/{(index+1):{0}>4}"
         print(f"{(index+1):{0}>4}/{(len(paths)):{0}>4} : {path}")
-        #Process(target = process, args= (index,)).run()
-        process(out, path)
+        Process(target = process, args= (out,path)).run()
+        #process(out, path)
         index += 1
     d_index += 1
     

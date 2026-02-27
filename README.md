@@ -19,5 +19,3 @@
 - Run `generate_resources.py` to convert images from your input folder into proper aspect ratio and format
 - Run `generate_ini.py` to generate 3DMigoto mod INI file according to the output images from the previous step
 - To skip certain subfolder or image from `output`, add "DISABLED" in the folder name before running the script for generating INI
-
-**WARNING: `generate_resources.py` will delete output folder when run**
