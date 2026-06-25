@@ -16,12 +16,13 @@ global persist $curr_img
 global $active_bar = 0
 global $active_bg = 0
 global $active_icon = 0
+global $active_it = 0
 \n'''
 
 present = '''
 [Present]
 x185 = $active_bar
-y185 = $active_bg
+y185 = $active_bg && ($active_it <= 0)
 z185 = $active_icon
 ; set vignette mode below
 ; 0 = none, 1 = bottom, 2 = top+bottom
@@ -31,9 +32,10 @@ y187 = 4
 post $active_bar = $active_bar - 1
 post $active_bg = $active_bg - 1
 post $active_icon = $active_icon - 1
+post $active_it = $active_it - 1
 post $frame = $frame + 1
 if $active_bar == 1
-  $curr_img = $frame % $n_imgs
+  $curr_img = ($frame + (time // 1)) % $n_imgs
 endif
 \n'''
 
@@ -53,10 +55,14 @@ hash = b7ff7a6e
 if $active_bar >= 1 && $active_bg >= 1
   run = CommandListLS
 endif
-if $active_bg >= 1 && $active_icon >= 1
+if $active_bg >= 1 && $active_icon >= 1 && $active_it <= 0
   run = CommandListLSLogin
 endif
 $active_bg = 2
+
+[TextureOverrideITIcon]
+hash = 19f6ed66
+$active_it = 2
 
 ; -----------------------------------
 
@@ -185,6 +191,19 @@ run = CommandListRegionIcon
 [TextureOverrideLSChenyuVale]
 hash = a292accf
 run = CommandListRegionIcon
+
+[TextureOverrideLSTempleOfSpace]
+hash = cb3097a8
+run = CommandListRegionIcon
+
+[TextureOverrideLSImaginariumTheatre]
+hash = 242d8aa6
+run = CommandListRegionIcon
+
+[TextureOverrideLSMiliastra]
+hash = 118e7fab
+run = CommandListRegionIcon
+
 
 ; ---------------------------------------
 
