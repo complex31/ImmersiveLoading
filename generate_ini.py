@@ -1,12 +1,31 @@
 import os
-res = os.walk("output")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+
+res = os.walk(OUTPUT_DIR)
 paths = []
 
 for r in res:
-  for f in r[2]:
-    p = (f"{r[0]}/{f}").replace("/", "\\")
-    if "DISABLED" not in p and (p.endswith((".png", ".jpg", "jpeg", ".dds"))):
-      paths.append(p)
+    for f in r[2]:
+        full_path = os.path.join(r[0], f)
+        rel_path = os.path.relpath(full_path, BASE_DIR).replace("/", "\\")
+        
+        if "DISABLED" not in rel_path and (rel_path.lower().endswith((".png", ".jpg", ".jpeg", ".dds"))):
+            paths.append(rel_path)
+
+if not paths:
+    print(f"\n[!] Error: No general background images found at: {OUTPUT_DIR}")
+    print("[!] Make sure to run the image generator script first.\n")
+    exit()
+
+login_file = "login\\output\\login.jpg"
+login_output_dir = os.path.join(BASE_DIR, "login", "output")
+if os.path.exists(login_output_dir):
+    for f in os.listdir(login_output_dir):
+        if f.lower().startswith("login") and f.lower().endswith((".png", ".jpg", ".jpeg", ".dds")):
+            login_file = os.path.relpath(os.path.join(login_output_dir, f), BASE_DIR).replace("/", "\\")
+            break
 
 n = len(paths)
 constants = f'''[Constants]
@@ -23,10 +42,7 @@ present = '''
 x185 = $active_bar
 y185 = $active_bg
 z185 = $active_icon
-; set vignette mode below
-; 0 = none, 1 = bottom, 2 = top+bottom
 x187 = 2
-; set vignette strength below, default = 4, use positive integer only to avoid bugs
 y187 = 4
 post $active_bar = $active_bar - 1
 post $active_bg = $active_bg - 1
@@ -118,10 +134,6 @@ $active_icon = 2
 
 ; ---------------------------------------
 
-;[TextureOverrideText]
-;hash = 45544863
-;run = CommandListLS_Text
-
 [TextureOverrideLSInazuma]
 hash = f7659a3a
 run = CommandListRegionIcon
@@ -195,15 +207,6 @@ run = CommandListCTO
 [ShaderOverrideLB]
 hash = 4f8eee47124e933d
 run = CommandListCTO
-
-;[ShaderOverrideVG]
-;hash = 04911d8f38cd5d4b
-;allow_duplicate_hash = overrule
-;run = CommandListCTO
-
-;[ShaderOverrideIcon]
-;hash = 4f028a0d23349e1f
-;run = CommandListCTO
 \n'''
 
 customshader = '''
@@ -214,19 +217,11 @@ draw = from_caller
 [CustomShaderLS]
 vs = f61f9bc2a15bedef-vs_replace.txt
 draw = from_caller
-
-;[CustomShaderVG]
-;ps = 04911d8f38cd5d4b-ps_replace.txt
-;draw = from_caller
-
-;[CustomShaderIcon]
-;ps = 4f028a0d23349e1f-ps_replace.txt
-;draw = from_caller
 \n'''
 
 resources = [
     "[ResourceLB]\nfilename = loadingbar_2x.dds\n",
-    "[ResourceLSLogin]\nfilename = .\\login\\login.jpg\n",
+    f"[ResourceLSLogin]\nfilename = .\\{login_file}\n",
     f"[ResourceLS.0]\nfilename = .\\{paths[0]}\n"
 ]
 
@@ -256,20 +251,21 @@ commandlist_cond = [
     commandlist_cond_prefix
 ]
 
-
-for i in range(1,n):
+for i in range(1, n):
     resources.append(f"[ResourceLS.{i}]\nfilename = .\\{paths[i]}\n")
     commandlist_cond.append(f"else if $curr_img == {i}\n  this = ResourceLS.{i}")
     
 commandlist_cond.append("endif\nrun = CustomShaderLS\n")
 
-inifile = open("mod.ini", "w")
-inifile.write(constants)
-inifile.write(present)
-inifile.write(overrides)
-inifile.write(customshader)
-inifile.write(commandlist)
-inifile.write("\n".join(commandlist_cond))
-inifile.write("\n\n; ---------- Resources ---------\n\n")
-inifile.write("\n".join(resources))
-inifile.close()
+ini_path = os.path.join(BASE_DIR, "mod.ini")
+with open(ini_path, "w") as inifile:
+    inifile.write(constants)
+    inifile.write(present)
+    inifile.write(overrides)
+    inifile.write(customshader)
+    inifile.write(commandlist)
+    inifile.write("\n".join(commandlist_cond))
+    inifile.write("\n\n; ---------- Resources ---------\n\n")
+    inifile.write("\n".join(resources))
+
+print(f"[✓] 'mod.ini' file generated successfully at: {ini_path}")

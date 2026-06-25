@@ -3,5 +3,5 @@
     "screen_height": 1440,
     "mode": "fill",
     "format": "jpg",
-    "input_dirs": ["input/sample"]
+    "input_dirs": ["input/normal_wide"]
 }
